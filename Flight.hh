@@ -35,6 +35,10 @@ public:
     int addTime(int whichRunway, int idxCurrent, int idxPrevious);
 };
 
+/**
+* TODO - Deve ser implementado um construtor para que seja possível adicionar o arquivo
+* TODO - diretamente do arquivo de texte de **input**
+*/ 
 Flight::Flight(int numberOfFlights, int numberOfRunWays){
 }
 
@@ -45,6 +49,7 @@ Flight::~Flight(){
 int Flight::totalFee(int idxCurrent, int idxPrevious, int actualTime){
     int time = (actualTime + departureTime[idxCurrent] + wakeTurbulence[idxPrevious][idxCurrent] - timeToFlight[idxCurrent]);
     return time * fee[idxCurrent];
+    return 1;
 }
 
 int Flight::bestFlight(int idxPrevious, int actualTime){
@@ -112,19 +117,26 @@ int Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
 int Flight::bestRunway (int actualTime){
 
     int bestIdx = 0;
-
+    int whichRunway = 0;
     for (int i = 0; i < numberOfFlights; i++)
     {
-        if (runways[i % numberOfRunWays].first.empty())
+        whichRunway = i % numberOfRunWays;
+        if (runways[whichRunway].first.empty())
         {
             bestIdx = bestFlight(NULL, 0);
-            runways[i % numberOfRunWays].first.push(bestIdx);
+            runways[whichRunway].first.push(bestIdx);
+            addTime(whichRunway, bestIdx, NULL);
+            haveFlown[bestIdx] = true;
             continue;
         }
-        bestIdx = bestFlight(runways[i % numberOfRunWays].first.back(), runways[i % numberOfRunWays].second);
-        runways[i % numberOfRunWays].first.push(bestIdx);
+        bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
+        runways[whichRunway].first.push(bestIdx);
+        addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
+        haveFlown[bestIdx] = true;
+        continue;
     }
-    
+
+    return 1;
 }
 
 
