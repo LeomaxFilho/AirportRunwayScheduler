@@ -120,6 +120,7 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
     runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
 }
 // TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
+// TODO algo como olhar o tempo atual de cada uma delas e decidir qual delas é a melhor para o momento
 void Flight::bestRunway (){
 
     int bestIdx = 0;
