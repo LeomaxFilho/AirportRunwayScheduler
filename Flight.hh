@@ -89,7 +89,7 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
         {
             if ((bestFlight != i) && (!haveFlown[i]))
             {
-                if ((totalFee(i, idxPrevious, currentTime) > totalFee(bestFlight, idxPrevious, currentTime)) )
+                if (totalFee(i, idxPrevious, currentTime) > totalFee(bestFlight, idxPrevious, currentTime))
                 {
                     bestFlight = i;
                 }
