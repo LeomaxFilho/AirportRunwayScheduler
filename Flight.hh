@@ -49,29 +49,37 @@ Flight::~Flight(){
 int Flight::totalFee(int idxCurrent, int idxPrevious, int actualTime){
     int time = (actualTime + departureTime[idxCurrent] + wakeTurbulence[idxPrevious][idxCurrent] - timeToFlight[idxCurrent]);
     return time * fee[idxCurrent];
-    return 1;
 }
 
 int Flight::bestFlight(int idxPrevious, int actualTime){
 
-    int bestFlight = NULL;
-    if (idxPrevious == NULL)
+    int bestFlight = -1;
+    for (int i = 0; i < numberOfFlights; ++i) {
+        if (!haveFlown[i]) {
+            bestFlight = i;
+            break;
+        }
+    }
+    if (bestFlight == -1)
     {
-        bestFlight = 0;
+        return -1;
+    }
+    
+    if (idxPrevious == -1)
+    {
+
         for (int i = 0; i < numberOfFlights; i++)
         {
-            if (bestFlight != i)
+            if ((bestFlight != i) && (!haveFlown[i]))
             {
-                if ((departureTime[i] < departureTime[bestFlight]) && (!haveFlown[i]))
-                    bestFlight = departureTime[i];
+                if (departureTime[i] < departureTime[bestFlight])
+                    bestFlight = i;
                 if (departureTime[bestFlight] == departureTime[i])
                 {
                     if (timeToFlight[i] < timeToFlight[bestFlight])
                     {
-                        bestFlight = timeToFlight[i];
-                        continue; // ! pode vir a gerar um erro, conferir depois
+                        bestFlight = i;
                     }
-                    bestFlight = timeToFlight[bestFlight];
                 }
             }
         }
@@ -79,19 +87,18 @@ int Flight::bestFlight(int idxPrevious, int actualTime){
 
         for (int i = 0; i < numberOfFlights; i++)
         {
-            if (i != idxPrevious)
+            if (((i != idxPrevious) && (bestFlight != i))&& (!haveFlown[i]))
             {
-                if ((totalFee(i, idxPrevious, actualTime) > totalFee(bestFlight, idxPrevious, actualTime)) && (!haveFlown[i]))
+                if ((totalFee(i, idxPrevious, actualTime) > totalFee(bestFlight, idxPrevious, actualTime)) )
                 {
                     bestFlight = i;
                 }
-                if (totalFee(i, idxPrevious, actualTime) == totalFee(bestFlight, idxPrevious, actualTime))
+                if ((totalFee(i, idxPrevious, actualTime) == totalFee(bestFlight, idxPrevious, actualTime)))
                 {
                     if (timeToFlight[i] < timeToFlight[bestFlight])
                     {
-                        bestFlight = timeToFlight[i];
+                        bestFlight = i;
                     }
-                    bestFlight = timeToFlight[bestFlight];
                 }
             }
         }
@@ -100,7 +107,7 @@ int Flight::bestFlight(int idxPrevious, int actualTime){
 }
 
 int Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
-    if (idxPrevious != NULL)
+    if (idxPrevious != -1)
     {
         if ((runways[whichRunway].second + wakeTurbulence[idxPrevious][idxCurrent])  < departureTime[idxCurrent])
         {
@@ -123,9 +130,9 @@ int Flight::bestRunway (int actualTime){
         whichRunway = i % numberOfRunWays;
         if (runways[whichRunway].first.empty())
         {
-            bestIdx = bestFlight(NULL, 0);
+            bestIdx = bestFlight(-1, 0);
             runways[whichRunway].first.push(bestIdx);
-            addTime(whichRunway, bestIdx, NULL);
+            addTime(whichRunway, bestIdx, -1);
             haveFlown[bestIdx] = true;
             continue;
         }
