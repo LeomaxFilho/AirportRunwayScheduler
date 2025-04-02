@@ -30,9 +30,9 @@ public:
     Flight(int numberOfFlights, int numberOfRunWays);
     ~Flight();
     int totalFee(int idxCurrent, int idxPrevious, int time);
-    int bestFlight(int idxPrevious, int actualTime);
-    int bestRunway (int actualTime);
-    int addTime(int whichRunway, int idxCurrent, int idxPrevious);
+    int bestFlight(int idxPrevious, int currentTime);
+    void bestRunway ();
+    void addTime(int whichRunway, int idxCurrent, int idxPrevious);
 };
 
 /**
@@ -46,12 +46,12 @@ Flight::~Flight(){
 
 }
 
-int Flight::totalFee(int idxCurrent, int idxPrevious, int actualTime){
-    int time = (actualTime + departureTime[idxCurrent] + wakeTurbulence[idxPrevious][idxCurrent] - timeToFlight[idxCurrent]);
+int Flight::totalFee(int idxCurrent, int idxPrevious, int currentTime){
+    int time = (currentTime + wakeTurbulence[idxPrevious][idxCurrent] - departureTime[idxCurrent]);
     return time * fee[idxCurrent];
 }
 
-int Flight::bestFlight(int idxPrevious, int actualTime){
+int Flight::bestFlight(int idxPrevious, int currentTime){
 
     int bestFlight = -1;
     for (int i = 0; i < numberOfFlights; ++i) {
@@ -87,13 +87,13 @@ int Flight::bestFlight(int idxPrevious, int actualTime){
 
         for (int i = 0; i < numberOfFlights; i++)
         {
-            if (((i != idxPrevious) && (bestFlight != i))&& (!haveFlown[i]))
+            if ((bestFlight != i) && (!haveFlown[i]))
             {
-                if ((totalFee(i, idxPrevious, actualTime) > totalFee(bestFlight, idxPrevious, actualTime)) )
+                if ((totalFee(i, idxPrevious, currentTime) > totalFee(bestFlight, idxPrevious, currentTime)) )
                 {
                     bestFlight = i;
                 }
-                if ((totalFee(i, idxPrevious, actualTime) == totalFee(bestFlight, idxPrevious, actualTime)))
+                if ((totalFee(i, idxPrevious, currentTime) == totalFee(bestFlight, idxPrevious, currentTime)))
                 {
                     if (timeToFlight[i] < timeToFlight[bestFlight])
                     {
@@ -106,22 +106,21 @@ int Flight::bestFlight(int idxPrevious, int actualTime){
     return bestFlight;
 }
 
-int Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
+void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
     if (idxPrevious != -1)
     {
         if ((runways[whichRunway].second + wakeTurbulence[idxPrevious][idxCurrent])  < departureTime[idxCurrent])
         {
             runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
-            return 1;
+            return;
         }
         runways[whichRunway].second += wakeTurbulence[idxPrevious][idxCurrent] + timeToFlight[idxCurrent];
-        return 1;
+        return;
     }
     runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
-    return 1;
 }
-
-int Flight::bestRunway (int actualTime){
+// TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
+void Flight::bestRunway (){
 
     int bestIdx = 0;
     int whichRunway = 0;
@@ -142,8 +141,6 @@ int Flight::bestRunway (int actualTime){
         haveFlown[bestIdx] = true;
         continue;
     }
-
-    return 1;
 }
 
 
