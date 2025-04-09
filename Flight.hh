@@ -67,7 +67,6 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
     
     if (idxPrevious == -1)
     {
-
         for (int i = 0; i < numberOfFlights; i++)
         {
             if ((bestFlight != i) && (!haveFlown[i]))
@@ -84,7 +83,6 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
             }
         }
     }else{
-
         for (int i = 0; i < numberOfFlights; i++)
         {
             if ((bestFlight != i) && (!haveFlown[i]))
@@ -119,15 +117,35 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
     }
     runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
 }
+
 // TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
 // TODO algo como olhar o tempo atual de cada uma delas e decidir qual delas é a melhor para o momento
 void Flight::bestRunway (){
 
     int bestIdx = 0;
     int whichRunway = 0;
+    int otherRunway;
     for (int i = 0; i < numberOfFlights; i++)
     {
-        whichRunway = i % numberOfRunWays;
+        for (int j = 0; j < numberOfRunWays; j++)
+        {
+            if (runways[j].second < runways[whichRunway].second)
+            {
+                whichRunway = j;
+            }
+            bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
+            addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
+            haveFlown[bestIdx] = true;
+        }
+        
+        
+        
+    }
+}
+#endif !FLIGHT
+
+/**
+ *         whichRunway = i % numberOfRunWays;
         if (runways[whichRunway].first.empty())
         {
             bestIdx = bestFlight(-1, 0);
@@ -141,8 +159,5 @@ void Flight::bestRunway (){
         addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
         haveFlown[bestIdx] = true;
         continue;
-    }
-}
-
-
-#endif !FLIGHT
+ * 
+ */
