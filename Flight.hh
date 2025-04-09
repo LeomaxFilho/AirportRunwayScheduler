@@ -124,7 +124,7 @@ void Flight::bestRunway (){
 
     int bestIdx = 0;
     int whichRunway = 0;
-    int otherRunway;
+
     for (int i = 0; i < numberOfFlights; i++)
     {
         for (int j = 0; j < numberOfRunWays; j++)
@@ -133,31 +133,27 @@ void Flight::bestRunway (){
             {
                 whichRunway = j;
             }
-            bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
-            addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
-            haveFlown[bestIdx] = true;
         }
-        
-        
-        
+        bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
+        addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
+        haveFlown[bestIdx] = true;
     }
 }
 #endif !FLIGHT
 
 /**
- *         whichRunway = i % numberOfRunWays;
-        if (runways[whichRunway].first.empty())
-        {
-            bestIdx = bestFlight(-1, 0);
-            runways[whichRunway].first.push(bestIdx);
-            addTime(whichRunway, bestIdx, -1);
-            haveFlown[bestIdx] = true;
-            continue;
-        }
-        bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
+    whichRunway = i % numberOfRunWays;
+    if (runways[whichRunway].first.empty())
+    {
+        bestIdx = bestFlight(-1, 0);
         runways[whichRunway].first.push(bestIdx);
-        addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
+        addTime(whichRunway, bestIdx, -1);
         haveFlown[bestIdx] = true;
         continue;
- * 
+    }
+    bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
+    runways[whichRunway].first.push(bestIdx);
+    addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
+    haveFlown[bestIdx] = true;
+    continue;
  */
