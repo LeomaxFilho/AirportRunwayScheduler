@@ -103,7 +103,7 @@ Flight::Flight(string file){
         fee.push_back(temp);
     }
     
-    // O gepeto disse q tinhha q inicializar valores para a matriz
+    // Alterar o tamanho dos vetores dentro dos vetores
     wakeTurbulence.resize(numberOfFlights);
     for (int i = 0; i < numberOfFlights; ++i) {
         wakeTurbulence[i].resize(numberOfFlights);
@@ -121,11 +121,6 @@ Flight::Flight(string file){
     }
 
     readFile.close();
-    
-    // Inicializacao do Bitmask todos com zero
-    /*for(int i=0; i< numberOfFlights; i++){
-        haveFlown.push_back(0);
-    }*/
 }
 
 Flight::~Flight(){
@@ -179,7 +174,7 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
                 }
                 if ((totalFee(i, idxPrevious, currentTime) == totalFee(bestFlight, idxPrevious, currentTime)))
                 {
-                    if (timeToFlight[i] < timeToFlight[bestFlight])
+                    if (fee[i] < fee[bestFlight])
                     {
                         bestFlight = i;
                     }
@@ -267,6 +262,7 @@ void Flight::bestRunway() {
 
 }
 
+<<<<<<< HEAD
 void Flight::totalPenality(){
 
     totalFeeToPay = 0;
@@ -308,3 +304,5 @@ void Flight::vnd(){
 
     
 }
+=======
+>>>>>>> b716ef04860c978018b243f3366953637d6a9c36
