@@ -177,7 +177,8 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
                 }
                 if ((totalFee(i, idxPrevious, currentTime) == totalFee(bestFlight, idxPrevious, currentTime)))
                 {
-                    if (fee[i] < fee[bestFlight])
+                    if (totalFee(i, bestFlight, currentTime + wakeTurbulence[bestFlight][i] + timeToFlight[bestFlight]) > totalFee(bestFlight, i, currentTime 
+                        + wakeTurbulence[i][bestFlight] + timeToFlight[i]))
                     {
                         bestFlight = i;
                     }
@@ -217,10 +218,23 @@ void Flight::bestRunway() {
     // Aloca os voos para as pistas
     for (int i = 0; i < numberOfFlights; ++i) {
         int whichRunway = 0;
-        for (int j = 0; j < numberOfRunWays; ++j) {
-            if (runways[j].second < runways[whichRunway].second) {
-                whichRunway = j;
+        for (int j = 1; j < numberOfRunWays; ++j) {
+             
+            if (runways[whichRunway].first.empty() || runways[j].first.empty())
+            {
+                if (runways[j].second < runways[whichRunway].second)
+                {
+                    
+                    whichRunway = j;
+                }
             }
+            else
+            {
+                if (runways[j].second + averageWakeTurbulence(runways[j].first.back()) < runways[whichRunway].second //calcula a media das turbulencias de esteiras do voo anterior
+                + averageWakeTurbulence(runways[whichRunway].first.back()))                                         // para adicionar ao "tempo" da pista.
+                {
+                    whichRunway = j;
+                }
         }
 
         int bestIdx = bestFlight(runways[whichRunway].first.empty() ? -1 : runways[whichRunway].first.back(), runways[whichRunway].second);
@@ -244,9 +258,10 @@ void Flight::bestRunway() {
         runways[whichRunway].second = startTime + timeToFlight[bestIdx];
 
         haveFlown[bestIdx] = true;
+        }
+    
     }
-
-    /* 
+    /*
     // Exibe a alocação dos voos nas pistas
     cout << "Alocação dos voos nas pistas:" << endl;
     for (int i = 0; i < numberOfRunWays; ++i) {
@@ -261,9 +276,8 @@ void Flight::bestRunway() {
     cout << "Multas de cada voo:" << endl;
     for (int i = 0; i < numberOfFlights; ++i) {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
-    }*/
-    totalPenality();
-
+    }
+    */
 }
 
 int Flight::calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp) {
