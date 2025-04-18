@@ -175,11 +175,22 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
                 {
                     bestFlight = i;
                 }
+
+                // nesse caso não há voo algum atrasado
                 if ((totalFee(i, idxPrevious, currentTime) == totalFee(bestFlight, idxPrevious, currentTime)))
                 {
-                    if (fee[i] < fee[bestFlight])
+                    if ((totalFee(i, idxPrevious, currentTime) == 0 ) && (totalFee(bestFlight, idxPrevious, currentTime) == 0))
                     {
-                        bestFlight = i;
+                        if (totalFee(i, bestFlight, currentTime) > totalFee(bestFlight, i, currentTime))
+                        {
+                            bestFlight = i;
+                        }
+                        
+                    } else {
+                        if (fee[i] < fee[bestFlight])
+                        {
+                            bestFlight = i;
+                        }
                     }
                 }
             }
@@ -203,6 +214,7 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
 }
 
 void Flight::bestRunway() {
+
     // Limpa as pistas antes de alocar os voos
     for (int i = 0; i < numberOfRunWays; ++i) {
         runways[i].first.clear();
