@@ -35,11 +35,6 @@ public:
 
 };
 
-/**
-* TODO - Deve ser implementado um construtor para que seja possível adicionar o arquivo
-* TODO - diretamente do arquivo de texte de **input**
-*/ 
-
 Flight::Flight(){}
 
 void Flight::showInputs(){
@@ -274,4 +269,3 @@ void Flight::bestRunway() {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
     }
 }
-
