@@ -31,6 +31,7 @@ public:
     int bestFlight(int idxPrevious, int currentTime);
     void bestRunway ();
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
+    int averageWakeTurbulence(int idx);
     void showInputs();
 
 };
@@ -123,6 +124,15 @@ Flight::Flight(string file){
 
 Flight::~Flight(){
 
+}
+
+int Flight:: averageWakeTurbulence(int idx){
+    int averageOfWakeTurbulence;
+    for (size_t i = 0; i < numberOfFlights; i++)
+    {
+        averageOfWakeTurbulence += wakeTurbulence[idx][i];
+    }
+    return averageOfWakeTurbulence / numberOfFlights;
 }
 
 int Flight::totalFee(int idxCurrent, int idxPrevious, int currentTime){
@@ -226,7 +236,9 @@ void Flight::bestRunway() {
     for (int i = 0; i < numberOfFlights; ++i) {
         int whichRunway = 0;
         for (int j = 0; j < numberOfRunWays; ++j) {
-            if (runways[j].second < runways[whichRunway].second) {
+            if (runways[j].second + averageWakeTurbulence(runways[j].first.back()) < runways[whichRunway].second //calcula a media das turbulencias de esteiras do voo anterior
+            + averageWakeTurbulence(runways[whichRunway].first.back()))                                         // para adicionar ao "tempo" da pista.
+            {
                 whichRunway = j;
             }
         }
