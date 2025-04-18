@@ -14,6 +14,7 @@ class Flight
 private:
     int numberOfFlights;
     int numberOfRunWays;
+    int totalFeeToPay;
     vector<pair<vector<int>, int>> runways; // Da pra melhorar essa estrutura
     vector<bool> haveFlown;
     vector<int> departureTime;
@@ -32,13 +33,10 @@ public:
     void bestRunway ();
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
     void showInputs();
+    void totalPenality();
+    void vnd();
 
 };
-
-/**
-* TODO - Deve ser implementado um construtor para que seja possível adicionar o arquivo
-* TODO - diretamente do arquivo de texte de **input**
-*/ 
 
 Flight::Flight(){}
 
@@ -73,7 +71,6 @@ void Flight::showInputs(){
         cout << endl;
     }
 }
-
 
 Flight::Flight(string file){
     
@@ -207,53 +204,6 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
     runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
 }
 
-/*
-void Flight::bestRunway() {
-    // Limpa as pistas antes de alocar os voos
-    for (int i = 0; i < numberOfRunWays; ++i) {
-        runways[i].first.clear(); // Limpa o vetor da pista
-        runways[i].second = 0; // Reinicializa o tempo da pista
-    }
-    
-    
-    haveFlown.assign(numberOfFlights, false); // Reinicializa o vetor haveFlown
-
-    // Aloca os voos para as pistas
-    for (int i = 0; i < numberOfFlights; ++i) {
-        int whichRunway = 0;
-        for (int j = 0; j < numberOfRunWays; ++j) {
-            if (runways[j].second < runways[whichRunway].second) {
-                whichRunway = j;
-            }
-        }
-
-        int bestIdx = bestFlight(runways[whichRunway].first.empty() ? -1 : runways[whichRunway].first.back(), runways[whichRunway].second);
-        runways[whichRunway].first.push_back(bestIdx); // Adiciona o voo ao vetor da pista
-        
-        // Verifica se a pista está vazia antes de passar o voo anterior para addTime
-        int previousFlight = -1;
-        if (!runways[whichRunway].first.empty()) {
-            if (runways[whichRunway].first.size() > 1) {
-                previousFlight = runways[whichRunway].first[runways[whichRunway].first.size() - 2];
-            }
-        }
-        addTime(whichRunway, bestIdx, previousFlight);
-
-        haveFlown[bestIdx] = true;
-    }
-
-    // Exibe a alocação dos voos nas pistas
-    std::cout << "\nAlocacao dos voos nas pistas:" << std::endl;
-    for (int i = 0; i < numberOfRunWays; ++i) {
-        std::cout << "Pista " << i << ": ";
-        for (int flightIdx : runways[i].first) {
-            std::cout << flightIdx << " ";
-        }
-        cout << " tempo - " << runways[i].second;
-        std::cout << std::endl;
-    }
-}*/
-
 void Flight::bestRunway() {
     // Limpa as pistas antes de alocar os voos
     for (int i = 0; i < numberOfRunWays; ++i) {
@@ -313,44 +263,48 @@ void Flight::bestRunway() {
     for (int i = 0; i < numberOfFlights; ++i) {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
     }
+    totalPenality();
+
 }
-/*
-// TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
-// TODO algo como olhar o tempo atual de cada uma delas e decidir qual delas é a melhor para o momento
-void Flight::bestRunway (){
 
-    int bestIdx = 0;
-    int whichRunway = 0;
+void Flight::totalPenality(){
 
-    for (int i = 0; i < numberOfFlights; i++)
-    {
-        for (int j = 0; j < numberOfRunWays; j++)
-        {
-            if (runways[j].second < runways[whichRunway].second)
-            {
-                whichRunway = j;
-            }
+    totalFeeToPay = 0;
+    
+    for(int i= 0; i <numberOfFlights; i++)
+        totalFeeToPay += flightPenalties[i];
+
+    cout << "Valor total Multa: " << totalFeeToPay << endl; 
+}
+
+void Flight::vnd(){
+    int k = 1;
+    int f = totalFeeToPay;
+    int f1;
+
+    while(k <= 3){
+        switch(k){
+            case 1:
+                //f1 = swap(f)
+                break;             
+            case 2:
+                //f1 = 2opt(f)
+                break;
+            case 3:
+                //f1 = reinsertion(f)
+                break;
         }
-        bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
-        addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
-        haveFlown[bestIdx] = true;
-    }
-}*/
-//#endif !FLIGHT
 
-/**
-    whichRunway = i % numberOfRunWays;
-    if (runways[whichRunway].first.empty())
-    {
-        bestIdx = bestFlight(-1, 0);
-        runways[whichRunway].first.push(bestIdx);
-        addTime(whichRunway, bestIdx, -1);
-        haveFlown[bestIdx] = true;
-        continue;
+        if(f > f1){
+            k = 1;
+            f = totalFeeToPay;
+
+
+        }
+
+
     }
-    bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
-    runways[whichRunway].first.push(bestIdx);
-    addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
-    haveFlown[bestIdx] = true;
-    continue;
- */
+
+
+    
+}
