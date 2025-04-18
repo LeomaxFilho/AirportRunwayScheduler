@@ -176,7 +176,8 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
                 {
                     if ((totalFee(i, idxPrevious, currentTime) == 0 ) && (totalFee(bestFlight, idxPrevious, currentTime) == 0))
                     {
-                        if (totalFee(i, bestFlight, currentTime) > totalFee(bestFlight, i, currentTime))
+                        if (totalFee(i, bestFlight, currentTime + wakeTurbulence[bestFlight][i] + timeToFlight[bestFlight]) > totalFee(bestFlight, i, currentTime 
+                            + wakeTurbulence[i][bestFlight] + timeToFlight[i]))
                         {
                             bestFlight = i;
                         }
