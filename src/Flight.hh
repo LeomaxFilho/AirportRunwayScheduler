@@ -6,6 +6,8 @@
 #include <fstream>
 #include <queue>
 #include <utility>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -15,7 +17,7 @@ private:
     int numberOfFlights;
     int numberOfRunWays;
     int totalFeeToPay;
-    vector<pair<vector<int>, int>> runways; // Da pra melhorar essa estrutura
+    vector<pair<vector<int>, int>> runways; 
     vector<bool> haveFlown;
     vector<int> departureTime;
     vector<int> timeToFlight;
@@ -30,12 +32,13 @@ public:
     ~Flight();
     int totalFee(int idxCurrent, int idxPrevious, int time);
     int bestFlight(int idxPrevious, int currentTime);
-    void bestRunway ();
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
     void showInputs();
     void totalPenality();
+    int swap(int f, vector<pair<vector<int>, int>> &runwaysTemp);
     void vnd();
-
+    void bestRunway ();
+    int calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp);
 };
 
 Flight::Flight(){}
@@ -243,6 +246,7 @@ void Flight::bestRunway() {
         haveFlown[bestIdx] = true;
     }
 
+    /* 
     // Exibe a alocação dos voos nas pistas
     cout << "Alocação dos voos nas pistas:" << endl;
     for (int i = 0; i < numberOfRunWays; ++i) {
@@ -257,52 +261,119 @@ void Flight::bestRunway() {
     cout << "Multas de cada voo:" << endl;
     for (int i = 0; i < numberOfFlights; ++i) {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
-    }
+    }*/
     totalPenality();
 
 }
 
-<<<<<<< HEAD
-void Flight::totalPenality(){
+int Flight::calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp) {
+    int totalPenalty = 0;
+    for (int i = 0; i < numberOfRunWays; ++i) {
+        int currentTime = 0;
+        int previousFlight = -1;
+        for (int flightIdx : runwaysTemp[i].first) {
+            // Calcula o tempo de inicio do voo
+            int startTime = currentTime;
+            if (previousFlight != -1) {
+                startTime += wakeTurbulence[previousFlight][flightIdx];
+            }
+            if (startTime < departureTime[flightIdx]) {
+                startTime = departureTime[flightIdx];
+            }
 
-    totalFeeToPay = 0;
-    
-    for(int i= 0; i <numberOfFlights; i++)
-        totalFeeToPay += flightPenalties[i];
+            // Calcula a multa e adiciona à penalidade total
+            totalPenalty += (startTime - departureTime[flightIdx]) * fee[flightIdx];
 
-    cout << "Valor total Multa: " << totalFeeToPay << endl; 
+            // Atualiza o tempo atual da pista
+            currentTime = startTime + timeToFlight[flightIdx];
+            previousFlight = flightIdx;
+        }
+    }
+    return totalPenalty;
 }
 
-void Flight::vnd(){
-    int k = 1;
-    int f = totalFeeToPay;
+int Flight::swap(int f, vector<pair<vector<int>, int>> &runwaysTemp){
+    
     int f1;
+    int f2 = f;
+    int temp;
 
-    while(k <= 3){
-        switch(k){
-            case 1:
-                //f1 = swap(f)
-                break;             
-            case 2:
-                //f1 = 2opt(f)
-                break;
-            case 3:
-                //f1 = reinsertion(f)
-                break;
+    vector<pair<vector<int>, int>> runwaysTemp2 = runwaysTemp;
+
+    for (int i= 0; i< numberOfRunWays; i++){
+        for (int j= 0; j< runwaysTemp[i].first.size(); j++){
+            for (int k= j + 1; k< numberOfRunWays; k++){
+                
+                // SWAP
+                temp = runwaysTemp2[i].first[j];     
+                runwaysTemp2[i].first[j] = runwaysTemp2[i].first[k];     
+                runwaysTemp2[i].first[k] = temp;
+
+                // Valor da Solucao encontrada
+                f1 = calculateTotalPenalty(runwaysTemp);
+                
+                if(f1 < f2)
+                    f2 = f1;
+            
+
+            }
+        
         }
-
-        if(f > f1){
-            k = 1;
-            f = totalFeeToPay;
-
-
-        }
-
 
     }
 
 
-    
+
+
 }
-=======
->>>>>>> b716ef04860c978018b243f3366953637d6a9c36
+
+void Flight::vnd(){
+
+    bestRunway();
+    int k = 1;
+    int f = totalFeeToPay;
+    int f1;
+
+    vector<pair<vector<int>, int>> runwaysTemp = runways; 
+    
+    while(k <= 3){
+        switch(k){
+            case 1:
+                swap(f,  runwaysTemp);
+                break;             
+            case 2:
+                //f1 = 2opt(f, vector<pair<vector<int>, int>> &runwaysTemp)
+                break;
+            case 3:
+                //f1 = reinsertion(f, vector<pair<vector<int>, int>> &runwaysTemp)
+                break;
+        }
+        if(k == 1) break;
+
+        if(f > f1){
+            k = 1;
+            f = f1;
+            runways = runwaysTemp;
+        }else{
+            k++;
+        }
+
+    }   
+
+    return;
+
+    cout << "Alocação dos voos nas pistas:" << endl;
+    for (int i = 0; i < numberOfRunWays; ++i) {
+        cout << "Pista " << i << ": ";
+        for (int flightIdx : runways[i].first) {
+            cout << flightIdx << " ";
+        }
+        cout << endl;
+    }
+
+    // Exibe as multas de cada voo
+    cout << "Multas de cada voo:" << endl;
+    for (int i = 0; i < numberOfFlights; ++i) {
+        cout << "Voo " << i << ": " << flightPenalties[i] << endl;
+    }
+}
