@@ -34,8 +34,6 @@ public:
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
     void showInputs();
     int averageWakeTurbulence(int idx);
-    void totalPenality();
-    void vnd();
 
 };
 
@@ -265,8 +263,10 @@ void Flight::bestRunway() {
         runways[whichRunway].second = startTime + timeToFlight[bestIdx];
 
         haveFlown[bestIdx] = true;
+        }
+    
     }
-
+    
     // Exibe a alocação dos voos nas pistas
     cout << "Alocação dos voos nas pistas:" << endl;
     for (int i = 0; i < numberOfRunWays; ++i) {
@@ -282,48 +282,4 @@ void Flight::bestRunway() {
     for (int i = 0; i < numberOfFlights; ++i) {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
     }
-    totalPenality();
-
-}
-
-void Flight::totalPenality(){
-
-    totalFeeToPay = 0;
-    
-    for(int i= 0; i <numberOfFlights; i++)
-        totalFeeToPay += flightPenalties[i];
-
-    cout << "Valor total Multa: " << totalFeeToPay << endl; 
-}
-
-void Flight::vnd(){
-    int k = 1;
-    int f = totalFeeToPay;
-    int f1;
-
-    while(k <= 3){
-        switch(k){
-            case 1:
-                //f1 = swap(f)
-                break;             
-            case 2:
-                //f1 = 2opt(f)
-                break;
-            case 3:
-                //f1 = reinsertion(f)
-                break;
-        }
-
-        if(f > f1){
-            k = 1;
-            f = totalFeeToPay;
-
-
-        }
-
-
-    }
-
-
-    
 }
