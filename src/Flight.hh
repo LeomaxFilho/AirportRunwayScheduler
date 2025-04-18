@@ -34,6 +34,7 @@ public:
     int bestFlight(int idxPrevious, int currentTime);
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
     void showInputs();
+    int averageWakeTurbulence(int idx);
     void totalPenality();
     int swap(int f, vector<pair<vector<int>, int>> &runwaysTemp);
     void vnd();
@@ -124,6 +125,15 @@ Flight::Flight(string file){
     }
 
     readFile.close();
+}
+
+int Flight:: averageWakeTurbulence(int idx){
+    int averageOfWakeTurbulence;
+    for (size_t i = 0; i < numberOfFlights; i++)
+    {
+        averageOfWakeTurbulence += wakeTurbulence[idx][i];
+    }
+    return averageOfWakeTurbulence / numberOfFlights;
 }
 
 Flight::~Flight(){
