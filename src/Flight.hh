@@ -128,11 +128,14 @@ Flight::~Flight(){
 
 int Flight:: averageWakeTurbulence(int idx){
     int averageOfWakeTurbulence;
+   /* 
     for (size_t i = 0; i < numberOfFlights; i++)
     {
         averageOfWakeTurbulence += wakeTurbulence[idx][i];
     }
     return averageOfWakeTurbulence / numberOfFlights;
+    */
+   return 1;
 }
 
 int Flight::totalFee(int idxCurrent, int idxPrevious, int currentTime){
@@ -235,11 +238,23 @@ void Flight::bestRunway() {
     // Aloca os voos para as pistas
     for (int i = 0; i < numberOfFlights; ++i) {
         int whichRunway = 0;
-        for (int j = 0; j < numberOfRunWays; ++j) {
-            if (runways[j].second + averageWakeTurbulence(runways[j].first.back()) < runways[whichRunway].second //calcula a media das turbulencias de esteiras do voo anterior
-            + averageWakeTurbulence(runways[whichRunway].first.back()))                                         // para adicionar ao "tempo" da pista.
+        for (int j = 1; j < numberOfRunWays; ++j) {
+            
+            if (runways[whichRunway].first.empty() || runways[j].first.empty())
             {
-                whichRunway = j;
+                if (runways[j].second < runways[whichRunway].second)
+                {
+                    
+                    whichRunway = j;
+                }
+            }
+            else
+            {
+                if (runways[j].second + averageWakeTurbulence(runways[j].first.back()) < runways[whichRunway].second //calcula a media das turbulencias de esteiras do voo anterior
+                + averageWakeTurbulence(runways[whichRunway].first.back()))                                         // para adicionar ao "tempo" da pista.
+                {
+                    whichRunway = j;
+                }
             }
         }
 
