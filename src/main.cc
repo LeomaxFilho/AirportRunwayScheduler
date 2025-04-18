@@ -24,10 +24,9 @@ int main(int argc, char *argv[]) {
 
     Flight flights("../inputs/teste.txt");
 
-    cout << "passou aqui\n";
     flights.showInputs();
     
-    //flights.bestRunway();
+    flights.bestRunway();
 
 
     return 0;

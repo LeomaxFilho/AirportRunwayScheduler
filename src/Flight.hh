@@ -20,6 +20,7 @@ private:
     vector<int> timeToFlight;
     vector<int> fee ;
     vector<vector<int>> wakeTurbulence;
+    vector<int> flightPenalties;
 
 public:
 
@@ -105,24 +106,29 @@ Flight::Flight(string file){
         fee.push_back(temp);
     }
     
-    // TA QUEBRANDO AQUIIIIIIIII
+    // O gepeto disse q tinhha q inicializar valores para a matriz
+    wakeTurbulence.resize(numberOfFlights);
+    for (int i = 0; i < numberOfFlights; ++i) {
+        wakeTurbulence[i].resize(numberOfFlights);
+    }
+
+    // Inicializa o vetor runways com o tamanho correto
+    runways.resize(numberOfRunWays);
+
     // Matriz de tempos
     for(int i=0; i <  numberOfFlights; i++){
         for(int j=0; j < numberOfFlights; j++){
             readFile >> temp;
-            cout << temp << endl;
-            wakeTurbulence[i].push_back(temp);
+            wakeTurbulence[i][j] = temp;  
         }  
-        cout << endl;
     }
-    cout << "aquiiiiiiiiiiiii\n";    
-    
+
     readFile.close();
     
     // Inicializacao do Bitmask todos com zero
-    for(int i=0; i< numberOfFlights; i++){
+    /*for(int i=0; i< numberOfFlights; i++){
         haveFlown.push_back(0);
-    }
+    }*/
 }
 
 Flight::~Flight(){
@@ -201,14 +207,15 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
     runways[whichRunway].second = departureTime[idxCurrent] + timeToFlight[idxCurrent];
 }
 
-
+/*
 void Flight::bestRunway() {
     // Limpa as pistas antes de alocar os voos
     for (int i = 0; i < numberOfRunWays; ++i) {
-        runways[i].first.clear();
+        runways[i].first.clear(); // Limpa o vetor da pista
         runways[i].second = 0; // Reinicializa o tempo da pista
     }
-
+    
+    
     haveFlown.assign(numberOfFlights, false); // Reinicializa o vetor haveFlown
 
     // Aloca os voos para as pistas
@@ -236,7 +243,63 @@ void Flight::bestRunway() {
     }
 
     // Exibe a alocação dos voos nas pistas
-    cout << "Alocação dos voos nas pistas:" << std::endl;
+    std::cout << "\nAlocacao dos voos nas pistas:" << std::endl;
+    for (int i = 0; i < numberOfRunWays; ++i) {
+        std::cout << "Pista " << i << ": ";
+        for (int flightIdx : runways[i].first) {
+            std::cout << flightIdx << " ";
+        }
+        cout << " tempo - " << runways[i].second;
+        std::cout << std::endl;
+    }
+}*/
+
+void Flight::bestRunway() {
+    // Limpa as pistas antes de alocar os voos
+    for (int i = 0; i < numberOfRunWays; ++i) {
+        runways[i].first.clear();
+        runways[i].second = 0; // Reinicializa o tempo da pista
+    }
+
+    haveFlown.assign(numberOfFlights, false); // Reinicializa o vetor haveFlown
+
+    // Reinicializa o vetor flightPenalties
+    flightPenalties.assign(numberOfFlights, 0);
+
+    // Aloca os voos para as pistas
+    for (int i = 0; i < numberOfFlights; ++i) {
+        int whichRunway = 0;
+        for (int j = 0; j < numberOfRunWays; ++j) {
+            if (runways[j].second < runways[whichRunway].second) {
+                whichRunway = j;
+            }
+        }
+
+        int bestIdx = bestFlight(runways[whichRunway].first.empty() ? -1 : runways[whichRunway].first.back(), runways[whichRunway].second);
+        runways[whichRunway].first.push_back(bestIdx);
+        
+        // Calcula o tempo de inicio do voo
+        int startTime = runways[whichRunway].second;
+        if (!runways[whichRunway].first.empty()) {
+            if (runways[whichRunway].first.size() > 1) {
+                startTime += wakeTurbulence[runways[whichRunway].first[runways[whichRunway].first.size() - 2]][bestIdx];
+            }
+        }
+        if (startTime < departureTime[bestIdx]) {
+            startTime = departureTime[bestIdx];
+        }
+
+        // Calcula a multa e armazena no vetor flightPenalties
+        flightPenalties[bestIdx] = (startTime - departureTime[bestIdx]) * fee[bestIdx];
+
+        // Atualiza o tempo da pista
+        runways[whichRunway].second = startTime + timeToFlight[bestIdx];
+
+        haveFlown[bestIdx] = true;
+    }
+
+    // Exibe a alocação dos voos nas pistas
+    cout << "Alocação dos voos nas pistas:" << endl;
     for (int i = 0; i < numberOfRunWays; ++i) {
         cout << "Pista " << i << ": ";
         for (int flightIdx : runways[i].first) {
@@ -244,9 +307,13 @@ void Flight::bestRunway() {
         }
         cout << endl;
     }
+
+    // Exibe as multas de cada voo
+    cout << "Multas de cada voo:" << endl;
+    for (int i = 0; i < numberOfFlights; ++i) {
+        cout << "Voo " << i << ": " << flightPenalties[i] << endl;
+    }
 }
-
-
 /*
 // TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
 // TODO algo como olhar o tempo atual de cada uma delas e decidir qual delas é a melhor para o momento
