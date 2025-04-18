@@ -106,7 +106,7 @@ Flight::Flight(string file){
         fee.push_back(temp);
     }
     
-    // O gepeto disse q tinhha q inicializar valores para a matriz
+    // Alterar o tamanho dos vetores dentro dos vetores
     wakeTurbulence.resize(numberOfFlights);
     for (int i = 0; i < numberOfFlights; ++i) {
         wakeTurbulence[i].resize(numberOfFlights);
@@ -124,11 +124,6 @@ Flight::Flight(string file){
     }
 
     readFile.close();
-    
-    // Inicializacao do Bitmask todos com zero
-    /*for(int i=0; i< numberOfFlights; i++){
-        haveFlown.push_back(0);
-    }*/
 }
 
 Flight::~Flight(){
@@ -267,43 +262,4 @@ void Flight::bestRunway() {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
     }
 }
-/*
-// TODO adicionar o critério para usar a pista que esta livre primeiro sempre..
-// TODO algo como olhar o tempo atual de cada uma delas e decidir qual delas é a melhor para o momento
-void Flight::bestRunway (){
 
-    int bestIdx = 0;
-    int whichRunway = 0;
-
-    for (int i = 0; i < numberOfFlights; i++)
-    {
-        for (int j = 0; j < numberOfRunWays; j++)
-        {
-            if (runways[j].second < runways[whichRunway].second)
-            {
-                whichRunway = j;
-            }
-        }
-        bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
-        addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
-        haveFlown[bestIdx] = true;
-    }
-}*/
-//#endif !FLIGHT
-
-/**
-    whichRunway = i % numberOfRunWays;
-    if (runways[whichRunway].first.empty())
-    {
-        bestIdx = bestFlight(-1, 0);
-        runways[whichRunway].first.push(bestIdx);
-        addTime(whichRunway, bestIdx, -1);
-        haveFlown[bestIdx] = true;
-        continue;
-    }
-    bestIdx = bestFlight(runways[whichRunway].first.back(), runways[whichRunway].second);
-    runways[whichRunway].first.push(bestIdx);
-    addTime(whichRunway, bestIdx, runways[whichRunway].first.back());
-    haveFlown[bestIdx] = true;
-    continue;
- */
