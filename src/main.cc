@@ -26,8 +26,9 @@ int main(int argc, char *argv[]) {
 
     flights.showInputs();
     
-    flights.bestRunway();
+    //flights.bestRunway();
 
+    flights.vnd();
 
     return 0;
 }
