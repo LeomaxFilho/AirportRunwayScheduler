@@ -14,6 +14,7 @@ class Flight
 private:
     int numberOfFlights;
     int numberOfRunWays;
+    int totalFeeToPay;
     vector<pair<vector<int>, int>> runways; // Da pra melhorar essa estrutura
     vector<bool> haveFlown;
     vector<int> departureTime;
@@ -31,8 +32,10 @@ public:
     int bestFlight(int idxPrevious, int currentTime);
     void bestRunway ();
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
-    int averageWakeTurbulence(int idx);
     void showInputs();
+    int averageWakeTurbulence(int idx);
+    void totalPenality();
+    void vnd();
 
 };
 
@@ -69,7 +72,6 @@ void Flight::showInputs(){
         cout << endl;
     }
 }
-
 
 Flight::Flight(string file){
     
@@ -128,14 +130,11 @@ Flight::~Flight(){
 
 int Flight:: averageWakeTurbulence(int idx){
     int averageOfWakeTurbulence;
-   /* 
     for (size_t i = 0; i < numberOfFlights; i++)
     {
         averageOfWakeTurbulence += wakeTurbulence[idx][i];
     }
     return averageOfWakeTurbulence / numberOfFlights;
-    */
-   return 1;
 }
 
 int Flight::totalFee(int idxCurrent, int idxPrevious, int currentTime){
@@ -183,23 +182,12 @@ int Flight::bestFlight(int idxPrevious, int currentTime){
                 {
                     bestFlight = i;
                 }
-
-                // nesse caso não há voo algum atrasado
                 if ((totalFee(i, idxPrevious, currentTime) == totalFee(bestFlight, idxPrevious, currentTime)))
                 {
-                    if ((totalFee(i, idxPrevious, currentTime) == 0 ) && (totalFee(bestFlight, idxPrevious, currentTime) == 0))
+                    if (totalFee(i, bestFlight, currentTime + wakeTurbulence[bestFlight][i] + timeToFlight[bestFlight]) > totalFee(bestFlight, i, currentTime 
+                        + wakeTurbulence[i][bestFlight] + timeToFlight[i]))
                     {
-                        if (totalFee(i, bestFlight, currentTime + wakeTurbulence[bestFlight][i] + timeToFlight[bestFlight]) > totalFee(bestFlight, i, currentTime 
-                            + wakeTurbulence[i][bestFlight] + timeToFlight[i]))
-                        {
-                            bestFlight = i;
-                        }
-                        
-                    } else {
-                        if (fee[i] < fee[bestFlight])
-                        {
-                            bestFlight = i;
-                        }
+                        bestFlight = i;
                     }
                 }
             }
@@ -223,7 +211,6 @@ void Flight::addTime(int whichRunway, int idxCurrent, int idxPrevious){
 }
 
 void Flight::bestRunway() {
-
     // Limpa as pistas antes de alocar os voos
     for (int i = 0; i < numberOfRunWays; ++i) {
         runways[i].first.clear();
@@ -239,7 +226,7 @@ void Flight::bestRunway() {
     for (int i = 0; i < numberOfFlights; ++i) {
         int whichRunway = 0;
         for (int j = 1; j < numberOfRunWays; ++j) {
-            
+             
             if (runways[whichRunway].first.empty() || runways[j].first.empty())
             {
                 if (runways[j].second < runways[whichRunway].second)
@@ -255,7 +242,6 @@ void Flight::bestRunway() {
                 {
                     whichRunway = j;
                 }
-            }
         }
 
         int bestIdx = bestFlight(runways[whichRunway].first.empty() ? -1 : runways[whichRunway].first.back(), runways[whichRunway].second);
@@ -296,4 +282,48 @@ void Flight::bestRunway() {
     for (int i = 0; i < numberOfFlights; ++i) {
         cout << "Voo " << i << ": " << flightPenalties[i] << endl;
     }
+    totalPenality();
+
+}
+
+void Flight::totalPenality(){
+
+    totalFeeToPay = 0;
+    
+    for(int i= 0; i <numberOfFlights; i++)
+        totalFeeToPay += flightPenalties[i];
+
+    cout << "Valor total Multa: " << totalFeeToPay << endl; 
+}
+
+void Flight::vnd(){
+    int k = 1;
+    int f = totalFeeToPay;
+    int f1;
+
+    while(k <= 3){
+        switch(k){
+            case 1:
+                //f1 = swap(f)
+                break;             
+            case 2:
+                //f1 = 2opt(f)
+                break;
+            case 3:
+                //f1 = reinsertion(f)
+                break;
+        }
+
+        if(f > f1){
+            k = 1;
+            f = totalFeeToPay;
+
+
+        }
+
+
+    }
+
+
+    
 }
