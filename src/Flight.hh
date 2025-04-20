@@ -410,29 +410,76 @@ void Flight::vnd(){
     bestRunway();
 
     int totalFee = totalFeeToPay;
-
+    int totalFee1;
+    int k=1;
+    int cont=0;
     vector<pair<vector<int>, int>> runwaysTemp = runways; 
 
-    int totalFee0 = swapLine(totalFee,  runwaysTemp);
+    int qtdNbh[3] = {0,0,0};
+    
+    while(k <= 3){
+        switch(k){
+         case 1:
+            totalFee1 = swapLine(totalFee, runwaysTemp);
+            ++qtdNbh[0];
+            break;
+        case 2:
+            totalFee1 = opt2(totalFee, runwaysTemp);
+            ++qtdNbh[1];
+            break;
+        case 3:
+            totalFee1 = reinsertion(totalFee, runwaysTemp);
+            ++qtdNbh[2];
+            break;
+        default: break;
+        }
 
-    int totalFee1 = opt2(totalFee0, runwaysTemp);
-
-
-    int totalFee2  = reinsertion(totalFee1, runwaysTemp);
+        if (totalFee1 < totalFee){
+            totalFee = totalFee1; // Atualiza valor da solucao calculada
+            runways = runwaysTemp; // Atualiza representacao da solucao
+            k = 1;
+        }else{
+            k++;
+        }
+        cont++;
+    }
+    
     
     cout << "\nPista depois do VND" << endl;
     cout << "Alocacao dos voos nas pistas:" << endl;
     for (int i = 0; i < numberOfRunWays; ++i) {
         cout << "Pista " << i << ": ";
-        for (int flightIdx : runwaysTemp[i].first) {
+        for (int flightIdx : runways[i].first) {
             cout << flightIdx << " ";
         }
         cout << endl;
     }
 
-    cout << "\nVALOR MULTA INICIO: " << totalFee << endl;
-    cout << "Valor total multa nova SWAP: " << totalFee0 << endl;
-    cout << "Valor total multa nova OPT: " << totalFee1 << endl;
-    cout << "Valor total multa nova REINSERTION: " << totalFee2 << endl;
+    cout << "Valor total multa anterior (GULOSO): " << totalFeeToPay<< endl;
+    cout << "Valor total multa nova (VND): " << totalFee << endl;
+
+    cout << "\n\n----------------------------------------------\n";
+    cout << "Movimentos de vizinhanca" << endl;
+    for(int i=0; i<3; i++){
+        switch (i+1)
+        {
+        case 1:
+            cout << "SWAP - " << qtdNbh[i] << endl;
+            break;
+        case 2:
+            cout << "OPT2 - " << qtdNbh[i] << endl;
+            break;
+
+        case 3:
+            cout << "REINSERTION - " << qtdNbh[i] << endl;
+            break;
+        default:
+            break;
+        }
+    }
+
+    cout << "Repeticoes no While - " << cont << endl;
 }
+
+
 
