@@ -37,9 +37,12 @@ public:
     void showInputs();
     int swapLine(int f, vector<pair<vector<int>, int>> &runwaysTemp);
     int opt2(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp);
+    int reinsertion(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp);
     void vnd();
     void bestRunway ();
     int calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp);
+    
+
 };
 
 Flight::Flight(){}
@@ -348,6 +351,53 @@ int Flight::opt2(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp){
     // Retorna a melhor solucao e o valor da multa
     runwaysTemp = bestRunway;
     return totalFee2;    
+}
+
+int Flight::reinsertion(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp){
+    
+    int totalFee1;
+    int totalFee2 = totalFee;
+    int temp;
+
+    vector<pair<vector<int>, int>> runwaysTemp2 = runwaysTemp;
+    vector<pair<vector<int>, int>> bestRunway;
+
+    
+    for (int i= 0; i< numberOfRunWays; i++){
+    
+        for (int j = 0; j< runwaysTemp[i].first.size(); j++){
+            for (int k = j + 2 ; k <= runwaysTemp[i].first.size(); k++){
+                
+/*                
+                vector<int> v = {1,2,3,4,5,6};
+    
+                v.insert(v.begin() + 3, v[0]);
+                v.erase(v.begin());
+            
+            
+                for (int i=0; i<v.size(); i++)
+                    cout << v[i] << " ";
+*/            
+
+                totalFee1 = calculateTotalPenalty(runwaysTemp2);
+            
+                if(totalFee1 < totalFee2)
+                {
+                    totalFee2 = totalFee1;
+                    bestRunway = runwaysTemp2;
+                }
+                runwaysTemp2 = runwaysTemp;
+            }
+        }
+        bestRunway = runwaysTemp2;
+    }
+
+    // Retorna a melhor solucao e o valor da multa
+    runwaysTemp = bestRunway;
+    return totalFee2;    
+
+
+
 }
 
 void Flight::vnd(){
