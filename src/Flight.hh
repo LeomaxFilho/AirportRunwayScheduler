@@ -281,60 +281,37 @@ int Flight::calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp) {
     return totalPenalty;
 }
 
-int Flight::swapLine(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp){
-    
-    int totalFee1;
-    int totalFee2 = totalFee;
+int Flight::swapLine(int totalFee, vector<pair<vector<int>, int>> &runway){
 
-    vector<pair<vector<int>, int>> runwaysTemp2 = runwaysTemp;
+    int totalFee0 = totalFee;
+    int totalFeeSwap;
+    vector<pair<vector<int>, int>> runwaysTemp = runway;
     vector<pair<vector<int>, int>> bestRunway = runwaysTemp;
-
+    int TEMP;
 
     for (int i = 0; i < numberOfRunWays; i++)
     {
-        while (next_permutation(runwaysTemp2[i].first.begin(), runwaysTemp2[i].first.end())) { // https://en.cppreference.com/w/cpp/algorithm/next_permutation
-
-            totalFee1 = calculateTotalPenalty(runwaysTemp2);
-            /*
-            cout << "****---------------------------------------------------------**** \n";
-            cout << "Alocacao dos voos nas pistas:" << endl;
-                for (int i = 0; i < numberOfRunWays; ++i) {
-                    cout << "Pista " << i << ": ";
-                    for (int flightIdx : runwaysTemp2[i].first) {
-                        cout << flightIdx << " ";
-                    }
-                    cout << endl;
-                }
-            cout << "\nMulta nova: " << totalFee2 << endl;
-            cout << "Multa anterior: " << totalFee << endl << endl;*/
-
-
-            if (totalFee1 < totalFee2)
+        for (int j = 0; j < runwaysTemp[i].first.size(); j++)
+        {
+            for (int k = j + 1; k < runwaysTemp[i].first.size(); k++)
             {
-                // cout << "--------------------------------------------------------- \n";
-                // cout << "\n encontramos uma pista melhor \n taxa antiga: " << totalFee2 << "\n taxa nova: " << totalFee1 << endl;
-                // cout << "                          ------------------------------- \n";
-                // cout << "Alocacao dos voos nas pistas:" << endl;
-                // for (int i = 0; i < numberOfRunWays; ++i) {
-                //     cout << "Pista " << i << ": ";
-                //     for (int flightIdx : runwaysTemp2[i].first) {
-                //         cout << flightIdx << " ";
-                //     }
-                //     cout << endl;
-                // }
+                TEMP = runwaysTemp[i].first[j];
+                runwaysTemp[i].first[j] = runwaysTemp[i].first[k];
+                runwaysTemp[i].first[k] = TEMP;
 
-                totalFee2 = totalFee1;
-                bestRunway = runwaysTemp2;
-            } 
+                totalFeeSwap = calculateTotalPenalty(runwaysTemp);
+                if (totalFeeSwap < totalFee0)
+                {
+                    totalFee0 = totalFeeSwap;
+                    bestRunway = runwaysTemp;
+                }
+                runwaysTemp = runway;
+            }
         }
-        runwaysTemp2 = bestRunway;
+        runwaysTemp = bestRunway;
     }
-    cout << "****---------------------------------------------------------**** \n";
-    cout << "\nMulta nova: " << totalFee2 << endl;
-    cout << "Multa anterior: " << totalFee << endl << endl;
-
-    runwaysTemp = bestRunway;
-    return totalFee2;
+    runway = bestRunway;
+    return totalFee0;
 }
 
 int Flight::opt2(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp){
@@ -347,41 +324,24 @@ int Flight::opt2(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp){
 
     // Implementar o SWAP entre os voos das pistas
     for (int i= 0; i< numberOfRunWays; i++){
-        //cout << i <<endl;
-        /*if(runwaysTemp[i].first.size() < 4)
-            continue;*/
+        if(runwaysTemp[i].first.size() < 4)
+            continue;
 
         for (int j = 0; j< runwaysTemp[i].first.size(); j++){
-            //cout << j << endl;
             for (int k = j + 4 ; k <= runwaysTemp[i].first.size(); k++){
-                cout << j << " " << k << endl;
                 
                 reverse(runwaysTemp2[i].first.begin() + j, runwaysTemp2[i].first.begin() + k );
                 
                 totalFee1 = calculateTotalPenalty(runwaysTemp2);
-                
-                /*
-                cout << "****---------------------------------------------------------**** \n";
-                cout << "Alocacao dos voos nas pistas:" << endl;
-                    for (int i = 0; i < numberOfRunWays; ++i) {
-                        cout << "Pista " << i << ": ";
-                        for (int flightIdx : runwaysTemp2[i].first) {
-                            cout << flightIdx << " ";
-                        }
-                        cout << endl;
-                    }
-                cout << "\nMulta nova: " << totalFee1 << endl;
-                cout << "Multa anterior: " << totalFee2 << endl << endl;*/
             
-                if(totalFee1 < totalFee2){
+                if(totalFee1 < totalFee2)
+                {
                     totalFee2 = totalFee1;
                     bestRunway = runwaysTemp2;
-                    
                 }
                 runwaysTemp2 = runwaysTemp;
             }
-        }                
-        // Salva a melhor solucao para a pista
+        }
         bestRunway = runwaysTemp2;
     }
 
@@ -399,9 +359,8 @@ void Flight::vnd(){
 
     vector<pair<vector<int>, int>> runwaysTemp = runways; 
 
-    //int totalFee1 = swapLine(totalFee,  runwaysTemp);
-
-    int totalFee1 = opt2(totalFee, runwaysTemp);
+    int totalFee0 = swapLine(totalFee,  runwaysTemp);
+    int totalFee1 = opt2(totalFee0, runwaysTemp);
 
     
 
@@ -415,7 +374,7 @@ void Flight::vnd(){
         cout << endl;
     }
 
-    cout << "Valor total multa nova: " << totalFee << endl;
-    cout << "Valor total multa nova: " << totalFee1 << endl;
+    cout << "Valor total multa nova SWAP: " << totalFee0 << endl;
+    cout << "Valor total multa nova OPT: " << totalFee1 << endl;
 }
 

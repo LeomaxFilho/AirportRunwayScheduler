@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
     //std::cout << "Nome da instancia chamada: " << argv[1] << std::endl;
 
-    Flight flights("../inputs/n3m10A.txt");
+    Flight flights("../inputs/n5m50A.txt");
 
     flights.showInputs();
 
