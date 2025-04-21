@@ -4,9 +4,8 @@
 
 int main(int argc, char *argv[]) {
 
-    //std::cout << "Nome da instancia chamada: " << argv[1] << std::endl;
-
-    Flight flights("n3m10E.txt");
+    std::string file(argv[1]);
+    Flight flights(file);
 
     auto startGuloso = chrono::high_resolution_clock::now();
     flights.bestRunway();
