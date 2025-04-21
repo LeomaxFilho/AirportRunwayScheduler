@@ -25,12 +25,14 @@ private:
     vector<int> timeToFlight;
     vector<int> fee ;
     vector<vector<int>> wakeTurbulence;
+    string instancia;
 
 public:
 
     Flight(string file);
     Flight();
     ~Flight();
+    void writeFile();
     int totalFee(int idxCurrent, int idxPrevious, int time);
     int bestFlight(int idxPrevious, int currentTime);
     void addTime(int whichRunway, int idxCurrent, int idxPrevious);
@@ -39,6 +41,7 @@ public:
     int opt2(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp);
     void reinsertionMove(vector<pair<vector<int>, int>> &runway, int idxfirst, int idxsecond, int howRunway);
     int reinsertion(int totalFee, vector<pair<vector<int>, int>> &runwaysTemp);
+    int throughRunways(int totalFee, vector<pair<vector<int>, int>> &vetor);
     void vnd();
     void bestRunway ();
     int calculateTotalPenalty(vector<pair<vector<int>, int>> runwaysTemp);
@@ -47,6 +50,29 @@ public:
 };
 
 Flight::Flight(){}
+
+void Flight::writeFile(){
+    string outputFileName = "../outputs/saida_" + instancia;
+    
+    cout << outputFileName << endl;
+
+    ofstream escrita(outputFileName);
+
+    if(!escrita.is_open()){
+        cout << "Erro ao abrir o arquivo de saida" << endl;
+        exit(EXIT_FAILURE); 
+    }
+
+    escrita << totalFeeToPay << endl;
+    for (int i = 0; i < numberOfRunWays; ++i) {
+        for (int flightIdx : runways[i].first) {
+            escrita << flightIdx << " ";
+        }
+        escrita << endl;
+    }
+
+    escrita.close();
+}
 
 void Flight::showInputs(){
     cout << numberOfFlights << endl;
@@ -81,8 +107,11 @@ void Flight::showInputs(){
 }
 
 Flight::Flight(string file){
-    
-    ifstream readFile(file);
+    instancia = file;
+
+    string arquivo = "../inputs/" + instancia;
+
+    ifstream readFile(arquivo);
     int temp;
 
     cout << file << endl;
@@ -132,7 +161,7 @@ Flight::Flight(string file){
 }
 
 Flight::~Flight(){
-
+    writeFile();
 }
 
 int Flight::totalFee(int idxCurrent, int idxPrevious, int currentTime){
@@ -404,10 +433,60 @@ int Flight::reinsertion(int totalFee, vector<pair<vector<int>, int>> &runwaysTem
     return totalFee2;    
 }
 
-void Flight::vnd(){
+int Flight::throughRunways(int totalFee, vector<pair<vector<int>, int>> &vetor){
 
-    // Euristica Construtiva
-    bestRunway();
+    int totalFee0 = totalFee;
+
+    int b = 0;
+    vector<pair<vector<int>, int>> runway(1);
+    runway[0].first.resize(numberOfFlights);
+
+    for(int i = 0; i < numberOfRunWays; i++)
+    {
+        for(int j = 0; j < vetor[i].first.size(); j++)
+        {
+            runway[0].first[b] = vetor[i].first[j];
+            b++;
+        }
+    }
+    
+    
+    vector<int> original = runway[0].first;
+    vector<pair<vector<int>, int>> exitFlow = vetor;
+
+    for (int i = 0; i < runway[0].first.size(); i++) {
+ 
+        for (int j = i + 1; j < runway[0].first.size(); j++) {
+            // Faz o swap
+            swap(runway[0].first[i], runway[0].first[j]);
+
+            b = 0;
+
+            for (int c = 0; c < numberOfRunWays; c++)
+            {
+                for (int d = 0; d < vetor[c].first.size(); d++)
+                {
+                    exitFlow[c].first[d] = runway[0].first[b];
+                    b++;
+                }
+                
+            }
+
+            int fee = calculateTotalPenalty(exitFlow);
+            if (fee < totalFee0)
+            {
+                vetor = exitFlow;
+                totalFee0 = fee;
+            }
+        
+            runway[0].first = original;
+        }
+    }
+
+    return totalFee0;
+}
+
+void Flight::vnd(){
 
     int totalFee = totalFeeToPay;
     int totalFee1;
@@ -415,21 +494,32 @@ void Flight::vnd(){
     int cont=0;
     vector<pair<vector<int>, int>> runwaysTemp = runways; 
 
-    int qtdNbh[3] = {0,0,0};
+    int qtdNbh[4] = {0,0,0,0};
     
-    while(k <= 3){
+    while(k <= 4){
         switch(k){
-         case 1:
-            totalFee1 = swapLine(totalFee, runwaysTemp);
-            ++qtdNbh[0];
+        case 1:
+            totalFee1 = throughRunways(totalFee, runwaysTemp);
+            ++qtdNbh[0];    
             break;
+         
         case 2:
-            totalFee1 = opt2(totalFee, runwaysTemp);
-            ++qtdNbh[1];
+            totalFee1 = swapLine(totalFee, runwaysTemp);
+            ++qtdNbh[1];  
+            /*totalFee1 = throughRunways(totalFee, runwaysTemp);
+            ++qtdNbh[0];    */
             break;
         case 3:
+            totalFee1 = opt2(totalFee, runwaysTemp);
+            ++qtdNbh[2];   
+            //totalFee1 = swapLine(totalFee, runwaysTemp);
+            //++qtdNbh[1];    
+            break;
+        case 4:
             totalFee1 = reinsertion(totalFee, runwaysTemp);
-            ++qtdNbh[2];
+            ++qtdNbh[3];
+            //totalFee1 = opt2(totalFee, runwaysTemp);
+            //++qtdNbh[2];    
             break;
         default: break;
         }
@@ -460,25 +550,30 @@ void Flight::vnd(){
 
     cout << "\n\n----------------------------------------------\n";
     cout << "Movimentos de vizinhanca" << endl;
-    for(int i=0; i<3; i++){
+    for(int i=0; i<4; i++){
         switch (i+1)
         {
         case 1:
-            cout << "SWAP - " << qtdNbh[i] << endl;
+            cout << "THROUGHRUNWAYS - " << qtdNbh[i] << endl;
             break;
         case 2:
+            cout << "SWAP - " << qtdNbh[i] << endl;
+            break;
+        case 3:
             cout << "OPT2 - " << qtdNbh[i] << endl;
             break;
-
-        case 3:
+        case 4:
             cout << "REINSERTION - " << qtdNbh[i] << endl;
             break;
+    
         default:
             break;
         }
     }
 
     cout << "Repeticoes no While - " << cont << endl;
+
+    totalFeeToPay = totalFee;
 }
 
 
